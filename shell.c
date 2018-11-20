@@ -31,10 +31,37 @@ int main()
 
 int main(){
     //struct stat * buff = malloc(sizeof(struct stat));
-    printf("Yeah OK:\n>>");
-    char inlin[256];
-    fgets(inlin, 256, stdin);
 
+    while("st"){
+        char cwd[256];
+        getcwd(cwd, 256);
+        printf(">>\n%s", cwd);
+        char inlin[256];
+        fgets(inlin, 256, stdin);
+        inlin[strlen(inlin) - 1] = 0;
+        char **buff = parse_args(inlin);
+    /*
+    int i = 0;
+    while(buff[i]){
+        printf("'%d'\n", buff[i++]);
+    }
+    */
+        int status = 0;
+        int f = fork();
+        wait(&status);
+        char * path;
+        if(!f){
+            if(!strcmp(buff[0], "cd")){
+                path = buff[1];
+                chdir(path);
+            }else{
+                execvp(buff[0], buff);
+            }
+        }else{
+            printf("PARENT STUFF\n");
+        }
+        free(buff);
+    }
     return 0;
 
 }
