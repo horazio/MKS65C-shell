@@ -1,2 +1,10 @@
-total 0
--rw-r--r-- 1 hfusco student 0 Nov 26 20:05 text.txt
+total 4
+-rw-r--r-- 1 hfusco student 60 Nov 26 20:32 text.txt
+total 4
+-rw-r--r-- 1 hfusco student 61 Nov 26 20:34 text.txt
+total 4
+-rw-r--r-- 1 hfusco student 122 Nov 26 20:36 text.txt
+total 4
+-rw-r--r-- 1 hfusco student 184 Nov 26 20:37 text.txt
+total 4
+-rw-r--r-- 1 hfusco student 246 Nov 26 20:37 text.txt

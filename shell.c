@@ -46,6 +46,17 @@ int main(){
 	int ff;
 	
 	while(buff[i]){
+	  if(!strcmp(buff[i], ">>")){
+	    squire = 1;
+            fd = open(buff[i + 1], O_WRONLY | O_APPEND);
+            if(fd == -1){
+              printf("okok: %s\n", strerror(errno));
+            }
+            ff = dup(1);
+            dup2(fd, 1);
+            buff[i--] = NULL;
+
+	  }
 	  if(!strcmp(buff[i], ">")){
 	    squire = 1;
 	    fd = open(buff[i + 1], O_WRONLY);
