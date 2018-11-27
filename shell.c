@@ -38,9 +38,26 @@ int main(){
       if(!strcmp(buff[0], "exit")){
 	exit(0);
         }
+
       
-	int i;
+	int i = 0;
+	int fd;
+	int squire = 0;
+	int ff;
 	
+	while(buff[i]){
+	  if(!strcmp(buff[i], ">")){
+	    squire = 1;
+	    fd = open(buff[i + 1], O_WRONLY);
+	    if(fd == -1){
+	      printf("okok: %s\n", strerror(errno));
+	    }
+	    ff = dup(1);
+	    dup2(fd, 1);
+	    buff[i--] = NULL;
+	  }
+	  i++;
+	}
 	
 	
 	
@@ -48,6 +65,10 @@ int main(){
         int f = fork();
         wait(&status);
 	char * path;
+
+
+
+	
 	
 	if(!strcmp(buff[0], "cd")){
 	  if(!f){
@@ -60,8 +81,13 @@ int main(){
 	
 	
         if(!f){
-	  execvp(buff[0], buff); 
-        }
+	  execvp(buff[0], buff);
+	}else{
+	  if(squire){
+	    close(fd);
+	    dup2(ff, 1);
+	  }
+	}
         free(buff);
     }
     return 0;
