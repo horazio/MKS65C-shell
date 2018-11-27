@@ -7,3 +7,4 @@
 #include <fcntl.h>
 #include <string.h>
 #include <dirent.h>
+#include <signal.h>
