@@ -24,12 +24,13 @@ void chain_pipe(char ** buff){
   int f;
   int status = 0;
   int fds[2];
+  
   while(buff[i]){
     if(!strcmp(buff[i], "|")){
         buff[i] == NULL;
         f = fork();
         pipe(fds);
-
+        printf("ok\n");
         wait(&status);
         if(!f){
             close(fds[READ]);
@@ -38,7 +39,7 @@ void chain_pipe(char ** buff){
         }else{
             dup2(fds[READ], 0);
             buff = &buff[i];
-            if( is_last(i, buff) ){
+            if( is_last(i, &buff[1]) ){
                 close(fds[WRITE]);
                 execvp(buff[1], buff);
             }
@@ -73,7 +74,9 @@ int main(){
         int ff;
         int fds[2];
   
-        chain_pipe(buff);
+        //chain_pipe(buff);
+        //buff[0] = NULL;
+      
       
         while(buff[i]){
             if(!strcmp(buff[i], "<")){
@@ -106,12 +109,12 @@ int main(){
                 dup2(fd, 1);
                 buff[i--] = NULL;
             }
-            /*
+            
             if(!strcmp(buff[i], "|")){
                 squire = 3;
                 buff[i--] = NULL;
             }
-            */
+            
             i++;
         }
 
