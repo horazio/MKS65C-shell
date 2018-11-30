@@ -10,6 +10,7 @@ char ** parse_args( char *line ){
     return args;
 }
 
+
 int is_last(int i, char ** buff){
   while(buff[i]){
      if(!strcmp(buff[i], "|")){
@@ -19,65 +20,108 @@ int is_last(int i, char ** buff){
   return 1;
 }
 
+
+void printBuffy(char ** buff){
+  int i = 0;
+  while(buff[i++]){
+    printf("'%s'\n", buff[i - 1]);
+  }
+}
+
+
+/*
 void chain_pipe(char ** buff){
   int i = 0;
   int f;
   int status = 0;
   int fds[2];
-  
+
   while(buff[i]){
+
     if(!strcmp(buff[i], "|")){
-        buff[i] == NULL;
-        f = fork();
-        pipe(fds);
-        printf("ok\n");
-        wait(&status);
-        if(!f){
-            close(fds[READ]);
-            dup2(fds[WRITE], 1);
-            execvp(buff[0], buff);
-        }else{
-            dup2(fds[READ], 0);
-            buff = &buff[i];
-            if( is_last(i, &buff[1]) ){
-                close(fds[WRITE]);
-                execvp(buff[1], buff);
-            }
+        buff[i] = NULL;
+
+          pipe(fds);
+          f = fork();
+          wait(&status);
+          if(!f){
+
+              printBuffy(buff);
+
+              close(fds[READ]);
+              dup2(fds[WRITE], 1);
+
+              execvp(buff[0], buff);
+          }else{
+              dup2(fds[READ], 0);
+
+              close(fds[READ]);
+              close(fds[WRITE]);
+
+              buff = &buff[i + 1];
+
+            if( is_last(i, &buff[i + 1]) ){
+              buff = & buff[i + 1];
+              printBuffy(buff);
+              execvp(buff[0], buff);
+             }
+
+              i = -1;
+          }
         }
-    }
+
+
     i++;
   }
 }
+*/
 
+
+char * * setup_n_receive(char * cwd, char * inlin){
+    getcwd(cwd, 256);
+    printf("\n%s>> ", cwd);
+    fgets(inlin, 256, stdin);
+    inlin[strlen(inlin) - 1] = 0;
+    return parse_args(inlin);
+}
 
 
 int main(){
 
+    char cwd[256];
+    char inlin[256];
+    char * path;
+    int i = 0;
+    int fd;
+    int squire = 0;
+    int ff;
+    int status = 0;
+    int new;
+    int fds[2];
+    char * * buff;
 
     while(1){
-        char cwd[256];
-        getcwd(cwd, 256);
-        printf("\n%s>> ", cwd);
-        char inlin[256];
-        fgets(inlin, 256, stdin);
-        inlin[strlen(inlin) - 1] = 0;
-        char **buff = parse_args(inlin);
+        buff = setup_n_receive(cwd, inlin);
 
         if(!strcmp(buff[0], "exit")){
             exit(0);
         }
 
 
-        int i = 0;
-        int fd;
-        int squire = 0;
-        int ff;
-        int fds[2];
-  
+        if(!strcmp(buff[0], "cd")){
+                path = buff[1];
+                chdir(path);
+                buff[0] = NULL;
+        }
+
+        i = 0;
+        squire = 0;
+
+
         //chain_pipe(buff);
         //buff[0] = NULL;
-      
-      
+
+
         while(buff[i]){
             if(!strcmp(buff[i], "<")){
                 squire = 2;
@@ -109,39 +153,23 @@ int main(){
                 dup2(fd, 1);
                 buff[i--] = NULL;
             }
-            
+
             if(!strcmp(buff[i], "|")){
                 squire = 3;
                 buff[i--] = NULL;
             }
-            
+
             i++;
         }
 
+        //forktime
 
-
-        int status = 0;
         int f = fork();
-
-
         wait(&status);
 
-        char * path;
 
 
 
-
-
-        if(!strcmp(buff[0], "cd")){
-            if(!f){
-                exit(0);
-            }else{
-                path = buff[1];
-                chdir(path);
-            }
-        }
-
-        int new;
 
         if(!f){
             if(squire == 3){
