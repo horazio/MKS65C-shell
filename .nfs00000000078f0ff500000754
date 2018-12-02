@@ -12,5 +12,3 @@ int check_redirect(char * * buff);
 
 int checker(char * * buff);
 
-void execLine(char * * buff);
-

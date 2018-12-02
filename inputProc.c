@@ -9,7 +9,21 @@ void printBuffy(char ** buff){
 }
 
 
-void chain_pipe(char ** buff){
+void execLine(char * * buff){
+  int f, status;
+  if (checker(buff)){
+     f = fork();
+     wait(&status);
+          
+     if(!f){
+        chain_pipe(buff);  
+     }
+        
+  }
+}
+
+
+void chain_pipe(char ** buff){ 
   
   int i = 0;
   int f;
