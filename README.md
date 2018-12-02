@@ -6,6 +6,7 @@ Features:
 -> Redirection is supported ('>', '<', '>>', but not '<<')
 -> Pipes can be chained
 -> This shell has a maximum argument length of 20
+-> Incorrect arguments don't break everything
 
 
 I briefly attempted to implement tab completion, but I soon realized it was going to be more work than I could handle
