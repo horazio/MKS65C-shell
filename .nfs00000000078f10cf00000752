@@ -1,0 +1,7 @@
+void chain_pipe(char ** buff);
+
+int redirect(int flag, int rw, int i, char * * buff);
+  
+int check_redirect(char * * buff);
+
+int checker(char * * buff)
