@@ -1,26 +1,27 @@
 #include "swag.h"
 
-
-char ** parse_args( char *line ){
-    char **args = calloc(8, sizeof(char *));
-    int i = 0;
-    while( line ) {
-        args[i] = strsep( &line, " " );
-        i++;
-    }
-    return args;
-}
-
-
 void printBuffy(char ** buff){
   int i = 0;
   while(buff[i++]){
-    printf("'%s'\n", buff[i - 1]);
+    printf("->%s<-\n", buff[i - 1]);
   }
 }
 
 
+void parse_args( char * line , char * * args){
+    int i = 0;
+    while( line ) {
+        args[i] = strsep( &line, " " );
+        i++;
+    } 
+}
+
+
+
+
+
 void chain_pipe(char ** buff){
+  
   int i = 0;
   int f;
   int fds[2];
@@ -45,20 +46,20 @@ void chain_pipe(char ** buff){
     }
     i++;
   }
+    
     execvp(buff[0], buff);
 }
 
 
 
-char * * setup_n_receive(){
-    char cwd[256];
-    char inlin[256];
+void setup_n_receive(char * * buff, char * cwd, char * inlin){
     getcwd(cwd, 256);
     printf("\n%s>> ", cwd);
     fgets(inlin, 256, stdin);
     inlin[strlen(inlin) - 1] = 0;
-    return parse_args(inlin);
+    parse_args(inlin, buff);
 }
+
 
 int redirect(int flag, int rw, int i, char * * buff){
   int ff, fd, status, f;
@@ -118,11 +119,15 @@ int checker(char * * buff){
 int main(){
     int f, status;
     char * * buff;
+    char cwd[256];
+    char inlin[256];
 
     while(1){
-        buff = setup_n_receive();
-
-        if (checker(buff)){
+      free(buff);
+      char * * buff = calloc(8, sizeof(char *));
+      setup_n_receive(buff, cwd, inlin);
+        
+      if (checker(buff)){
         
           f = fork();
           wait(&status);
