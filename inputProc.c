@@ -103,9 +103,13 @@ int checker(char * * buff){
 
 void parse_args( char * line , char * * args){
     int i = 0;
+    char * temp;
     while( line ) {
-        args[i] = strsep( &line, " " );
-        i++;
+        temp = strsep( &line, " " );
+        if(strlen(temp) > 0){
+          args[i] = temp; 
+          i++;
+        }
     } 
 }
 
