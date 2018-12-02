@@ -14,3 +14,4 @@ int checker(char * * buff);
 
 void execLine(char * * buff);
 
+void scanLines(char * * buff);

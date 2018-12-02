@@ -8,6 +8,19 @@ void printBuffy(char ** buff){
   }
 }
 
+void scanLines(char * * buff){
+  int i = 0;
+  while(buff[i]){
+    if(!strcmp(buff[i], ";")){
+      buff[i] = NULL;
+      execLine(buff);
+      buff = &buff[i + 1];
+      i = -1;
+    }
+    i++;
+  }
+  execLine(buff);
+}
 
 void execLine(char * * buff){
   int f, status;

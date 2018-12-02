@@ -9,10 +9,8 @@ int main(){
     while(1){
       free(buff);
       char * * buff = calloc(8, sizeof(char *));
-      setup_n_receive(buff, cwd, inlin);
-      
-      execLine(buff);
-      
+      setup_n_receive(buff, cwd, inlin); 
+      scanLines(buff);
     }
   
     //not sure why this is even here but ok
