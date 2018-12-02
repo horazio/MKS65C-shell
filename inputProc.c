@@ -76,6 +76,8 @@ void chain_pipe(char ** buff){
         close(fds[READ]);
         dup2(fds[WRITE], 1);
         execvp(buff[0], buff);
+        printf("What do you mean?\n");
+        exit(0);
       }else{
         close(fds[WRITE]);
         dup2(fds[READ], 0);
@@ -87,6 +89,8 @@ void chain_pipe(char ** buff){
   }
     
     execvp(buff[0], buff);
+    printf("What do you mean?\n");
+    exit(0);
 }
 
 //Takes a flag corresponding to how it should open the file,
@@ -112,6 +116,8 @@ int redirect(int flag, int rw, int i, char * * buff){
   wait(&status);
   if(!f){
       execvp(buff[0], buff); 
+      printf("What do you mean?\n");
+      exit(0);
   }      
   close(fd);
   dup2(ff, rw);
