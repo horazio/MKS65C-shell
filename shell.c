@@ -29,6 +29,46 @@ void printBuffy(char ** buff){
 }
 
 
+
+void chain_pipe(char ** buff){
+  int i = 0;
+  int f;
+  int fds[2];
+  int status;
+  int cpy;
+  
+  
+  while(buff[i]){
+    if(!strcmp(buff[i], "|")){
+      pipe(fds);
+      //printf("asdf\n");
+      buff[i] = NULL;
+      f = fork();
+      wait(&status);
+      if(!f){
+        //printBuffy(buff);
+        close(fds[READ]);
+        dup2(fds[WRITE], 1);
+        //buff = &buff[i + 1];
+        execvp(buff[0], buff);
+      }else{
+        close(fds[WRITE]);
+        dup2(fds[READ], 0);
+        buff = &buff[i + 1];
+        //printBuffy(buff);
+        //printf("asdf\n");
+        chain_pipe(buff);
+      }
+      //close(fds[READ]);
+      //close(fds[WRITE]);
+    }
+    i++;
+  }
+    //printf("poire\n");
+    //printBuffy(buff);
+    execvp(buff[0], buff);
+}
+
 /*
 void chain_pipe(char ** buff){
   int i = 0;
@@ -76,7 +116,6 @@ void chain_pipe(char ** buff){
 }
 */
 
-
 char * * setup_n_receive(char * cwd, char * inlin){
     getcwd(cwd, 256);
     printf("\n%s>> ", cwd);
@@ -97,6 +136,7 @@ int main(){
     int ff;
     int status = 0;
     int new;
+    int f;
     int fds[2];
     char * * buff;
 
@@ -117,9 +157,14 @@ int main(){
         i = 0;
         squire = 0;
 
-
-        //chain_pipe(buff);
-        //buff[0] = NULL;
+  /*
+        f = fork();
+        wait(&status);
+        if(!f){
+          chain_pipe(buff);
+        }
+        printf("asdfasdf\n");
+        */
 
 
         while(buff[i]){
@@ -156,44 +201,25 @@ int main(){
 
             if(!strcmp(buff[i], "|")){
                 squire = 3;
-                buff[i--] = NULL;
             }
 
             i++;
         }
 
+
         //forktime
 
-        int f = fork();
+        f = fork();
         wait(&status);
-
-
 
 
 
         if(!f){
             if(squire == 3){
-                if(pipe(fds) == -1){
-                    printf("ok pipe error : %s\n", strerror(errno));
-                }
-                new = fork();
-                if(new){
-
-                    close(fds[READ]);
-                    dup2(fds[WRITE], 1);
-                    execvp(buff[0], buff);
-                }
-                else{
-
-                    close(fds[WRITE]);
-
-                    dup2(fds[READ], 0);
-
-                    buff = & buff[i + 1];
-                    execvp(buff[0], buff);
-                }
+              chain_pipe(buff);  
+            }else{
+              execvp(buff[0], buff);
             }
-            execvp(buff[0], buff);
         }else{
             if(squire == 1){
                 close(fd);
