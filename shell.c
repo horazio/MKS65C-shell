@@ -50,12 +50,52 @@ void chain_pipe(char ** buff){
 
 
 
-char * * setup_n_receive(char * cwd, char * inlin){
+char * * setup_n_receive(){
+    char cwd[256];
+    char inlin[256];
     getcwd(cwd, 256);
     printf("\n%s>> ", cwd);
     fgets(inlin, 256, stdin);
     inlin[strlen(inlin) - 1] = 0;
     return parse_args(inlin);
+}
+
+int redirect(int flag, int rw, int i, char * * buff){
+  int ff, fd, status, f;
+  fd = open(buff[i + 1], flag);
+  if(fd == -1){
+      printf("okok: %s\n", strerror(errno));
+  }  
+  ff = dup(rw);
+  dup2(fd, rw);
+  buff[i] = NULL;
+  f = fork();
+  wait(&status);
+  if(!f){
+      execvp(buff[0], buff); 
+  }      
+  close(fd);
+  dup2(ff, rw);
+  return 0;
+}
+
+
+int check_redirect(char * * buff){
+  int i = 0;
+  while(buff[i]){
+            if(!strcmp(buff[i], "<")){
+                return redirect(O_RDONLY, READ, i, buff);
+            }
+            if(!strcmp(buff[i], ">>")){
+                return redirect(O_WRONLY | O_APPEND, WRITE, i, buff);
+                
+            }
+            if(!strcmp(buff[i], ">")){
+                return redirect(O_WRONLY, WRITE, i, buff);
+            }
+            i++;
+        }
+  return 1;
 }
 
 
@@ -69,95 +109,31 @@ int checker(char * * buff){
     chdir(buff[1]);
     return 0;
   }
-  return 1;
+    
+  return check_redirect(buff);
 }
 
 
-int main(){
 
-    char cwd[256];
-    char inlin[256];
-    char * path;
-    int i = 0;
-    int fd;
-    int squire = 0;
-    int ff;
-    int status = 0;
-    int new;
-    int f;
-    int fds[2];
+int main(){
+    int f, status;
     char * * buff;
 
     while(1){
-        buff = setup_n_receive(cwd, inlin);
+        buff = setup_n_receive();
 
         if (checker(buff)){
-
-        i = 0;
+        
+          f = fork();
+          wait(&status);
           
-        squire = 0;
-
-
-
-        while(buff[i]){
-            if(!strcmp(buff[i], "<")){
-                squire = 2;
-                fd = open(buff[i + 1], O_RDONLY);
-                if(fd == -1){
-                    printf("okok: %s\n", strerror(errno));
-                }
-                ff = dup(0);
-                dup2(fd, 0);
-                buff[i--] = NULL;
-            }
-            if(!strcmp(buff[i], ">>")){
-                squire = 1;
-                fd = open(buff[i + 1], O_WRONLY | O_APPEND);
-                if(fd == -1){
-                    printf("okok: %s\n", strerror(errno));
-                }
-                ff = dup(1);
-                dup2(fd, 1);
-                buff[i--] = NULL;
-            }
-            if(!strcmp(buff[i], ">")){
-                squire = 1;
-                fd = open(buff[i + 1], O_WRONLY);
-                if(fd == -1){
-                    printf("okok: %s\n", strerror(errno));
-                }
-                ff = dup(1);
-                dup2(fd, 1);
-                buff[i--] = NULL;
-            }
-
-            if(!strcmp(buff[i], "|")){
-                squire = 3;
-            }
-
-            i++;
-        }
-
-
-        //forktime
-
-        f = fork();
-        wait(&status);
-
-        if(!f){
+          if(!f){
            chain_pipe(buff);  
-        }else{
-            if(squire == 1){
-                close(fd);
-                dup2(ff, 1);
-            }else if(squire == 2){
-                close(fd);
-                dup2(ff, 0);
-            }
+          }
+        
         }
-      }
-      
     }
+  
     //not sure why this is even here but ok
     return 0;
 
