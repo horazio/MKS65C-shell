@@ -66,7 +66,8 @@ int redirect(int flag, int rw, int i, char * * buff){
   fd = open(buff[i + 1], flag);
   if(fd == -1){
       printf("okok: %s\n", strerror(errno));
-  }  
+  }
+  
   ff = dup(rw);
   dup2(fd, rw);
   buff[i] = NULL;
@@ -92,7 +93,8 @@ int check_redirect(char * * buff){
                 
             }
             if(!strcmp(buff[i], ">")){
-                return redirect(O_WRONLY, WRITE, i, buff);
+                
+                return redirect(O_WRONLY | O_TRUNC, WRITE, i, buff);
             }
             i++;
         }
@@ -128,7 +130,6 @@ int main(){
       setup_n_receive(buff, cwd, inlin);
         
       if (checker(buff)){
-        
           f = fork();
           wait(&status);
           
