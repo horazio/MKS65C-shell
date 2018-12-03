@@ -31,13 +31,17 @@ void scanLines(char * * buff){
     }
     i++;
   }
-  execLine(buff);
+  if(!buff[0]){
+    printf("What do you mean?");
+  }else{
+    execLine(buff);
+  }
 }
 
 //Takes a string array guaranteed to have no semicolons
 
 //First it checks for special commands like exit or redirects
-//If there are none, it executes the line as a chain of pipes 
+//If there are none, it executes the line as a chain of pipes
 //(Regular commands are just a chain of pipes of length 1)
 
 //Void
@@ -46,11 +50,11 @@ void execLine(char * * buff){
   if (checker(buff)){
      f = fork();
      wait(&status);
-          
+
      if(!f){
-        chain_pipe(buff);  
+        chain_pipe(buff);
      }
-        
+
   }
 }
 
@@ -59,13 +63,13 @@ void execLine(char * * buff){
 //Recursively chains pipes
 
 //Void
-void chain_pipe(char ** buff){ 
-  
+void chain_pipe(char ** buff){
+
   int i = 0;
   int f;
   int fds[2];
   int status;
-  
+
   while(buff[i]){
     if(!strcmp(buff[i], "|")){
       pipe(fds);
@@ -87,7 +91,7 @@ void chain_pipe(char ** buff){
     }
     i++;
   }
-    
+
     execvp(buff[0], buff);
     printf("What do you mean?\n");
     exit(0);
@@ -99,7 +103,7 @@ void chain_pipe(char ** buff){
 //A string array
 
 //The string array is guaranteed to have to have no semicolons, and a redirect command
-//Handles the redirect by using pipes, based on what the flag and the rw are 
+//Handles the redirect by using pipes, based on what the flag and the rw are
 
 //Returns 0
 int redirect(int flag, int rw, int i, char * * buff){
@@ -108,17 +112,17 @@ int redirect(int flag, int rw, int i, char * * buff){
   if(fd == -1){
       printf("okok: %s\n", strerror(errno));
   }
-  
+
   ff = dup(rw);
   dup2(fd, rw);
   buff[i] = NULL;
   f = fork();
   wait(&status);
   if(!f){
-      execvp(buff[0], buff); 
+      execvp(buff[0], buff);
       printf("What do you mean?\n");
       exit(0);
-  }      
+  }
   close(fd);
   dup2(ff, rw);
   return 0;
@@ -138,10 +142,10 @@ int check_redirect(char * * buff){
             }
             if(!strcmp(buff[i], ">>")){
                 return redirect(O_WRONLY | O_APPEND, WRITE, i, buff);
-                
+
             }
             if(!strcmp(buff[i], ">")){
-                
+
                 return redirect(O_WRONLY | O_TRUNC, WRITE, i, buff);
             }
             i++;
@@ -165,7 +169,7 @@ int checker(char * * buff){
     chdir(buff[1]);
     return 0;
   }
-    
+
   return check_redirect(buff);
 }
 
@@ -185,10 +189,10 @@ void parse_args( char * line , char * * args){
     while( line ) {
         temp = strsep( &line, " " );
         if(strlen(temp) > 0){
-          args[i] = temp; 
+          args[i] = temp;
           i++;
         }
-    } 
+    }
 }
 
 //Takes a string array and two string buffers

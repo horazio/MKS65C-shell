@@ -1,8 +1,0 @@
-#include "print.h"
-
-void printBuffy(char ** buff){
-  int i = 0;
-  while(buff[i++]){
-    printf("->%s<-\n", buff[i - 1]);
-  }
-}
