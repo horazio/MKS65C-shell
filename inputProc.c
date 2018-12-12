@@ -201,8 +201,10 @@ void parse_args( char * line , char * * args){
 
 //Void
 void setup_n_receive(char * * buff, char * cwd, char * inlin){
-    getcwd(cwd, 256);
-    printf("\n%s>> ", cwd);
+    if(isatty(0)){
+        getcwd(cwd, 256);
+        printf("\n%s>> ", cwd);
+    }
     fgets(inlin, 256, stdin);
     inlin[strlen(inlin) - 1] = 0;
     parse_args(inlin, buff);
